@@ -62,7 +62,7 @@ jobs:
               git -C ../go-src rm --cached -r .
               git -C ../go-src clean -d -f
             fi
-            DIC=`find . -maxdepth 1 -type d`
+            DIC=`find . -maxdepth 1 -mindepth 1 -type d |grep -v "\/\." | sed 's!^.*/!!'`
             for DIR in $DIC
             do
               echo $DIR
