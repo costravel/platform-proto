@@ -28,9 +28,13 @@ jobs:
           command: rm -rf ./*/pb-go
       - run:
           name: Generate gRPC for go Project=costravel-user
-          command: docker-compose run --rm go
-          environment:
-            PROJECT: costravel-user
+          command: |
+            DIC=`find . -maxdepth 1 -mindepth 1 -type d |grep -v "\/\." | sed 's!^.*/!!'`
+            for DIR in $DIC
+            do
+              echo "export PROJECT=${DIR}" >> $BASH_ENV
+              docker-compose run --rm go
+            done
       - persist_to_workspace:
           root: .
           paths:
@@ -73,7 +77,7 @@ jobs:
             result=0
             git -C ../go-src commit -m "AUTO GENERATED" || result=$?
             if [ $result -eq 0 ]; then
-              git -C ../go-src push upstream generated/go 2> /dev/null
+              git -C ../go-src push upstream generated/go
             fi
 
 workflows:
