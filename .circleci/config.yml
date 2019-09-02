@@ -52,7 +52,7 @@ jobs:
           command: |
             git config user.email "circleci@costravel.net"
             git config user.name "CircleCI"
-            git remote add upstream https://github.com/costravel/platform-proto.git
+            git remote add upstream https://${GH_TOKEN}@github.com/costravel/platform-proto.git
       - run:
           name: git commit go-src
           command: |
@@ -79,7 +79,7 @@ jobs:
             result=0
             git -C ../go-src commit -m "AUTO GENERATED" || result=$?
             if [ $result -eq 0 ]; then
-              git -C ../go-src push upstream generated/go
+              git -C ../go-src push upstream generated/go 2> /dev/null
             fi
 
 workflows:
