@@ -33,6 +33,8 @@ jobs:
             for DIR in $DIC
             do
               echo "export PROJECT=${DIR}" >> $BASH_ENV
+              source $BASH_ENV
+              echo $PROJECT
               docker-compose run --rm go
             done
       - persist_to_workspace:
