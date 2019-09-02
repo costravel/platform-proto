@@ -31,7 +31,7 @@ jobs:
           command: docker-compose run --rm go
           environment:
             PROJECT: costravel-user
-       - persist_to_workspace:
+      - persist_to_workspace:
           root: .
           paths:
             - .
