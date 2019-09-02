@@ -87,6 +87,10 @@ workflows:
   build_and_push:
     jobs:
       - lint
+          filters:
+            branches:
+              ignore:
+                - generated/go
       - build:
           requires:
             - lint
