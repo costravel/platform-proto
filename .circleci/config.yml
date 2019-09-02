@@ -1,0 +1,93 @@
+version: 2
+
+references:
+  defaults: &defaults
+    working_directory: ~/grpc-gen
+    machine: true
+
+jobs:
+  lint:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Lint
+          command: docker-compose run --rm lint
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  build:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Clean up
+          command: rm -rf ./*/pb-go
+      - run:
+          name: Generate gRPC for go Project=costravel-user
+          command: docker-compose run --rm go
+          environment:
+            PROJECT: costravel-user
+       - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  push:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: git config
+          command: |
+            git config user.email "circleci@costravel.net"
+            git config user.name "CircleCI"
+            git remote add upstream https://github.com/costravel/platform-proto.git
+      - run:
+          name: git commit go-src
+          command: |
+            if [ `git branch -r --list origin/generated/go | wc -l` -eq 1 ]; then
+              echo "checkout generated/go"
+              git fetch origin
+              git worktree add -b generated/go ../go-src origin/generated/go
+              git -C ../go-src rm `git -C ../go-src ls-files`
+            else
+              echo "create generated/go"
+              git worktree add --detach ../go-src
+              git -C ../go-src checkout --orphan generated/go
+              git -C ../go-src rm --cached -r .
+              git -C ../go-src clean -d -f
+            fi
+            cp -a pb-go/* ../go-src/
+            git -C ../go-src add -A
+            git -C ../go-src status
+            result=0
+            git -C ../go-src commit -m "AUTO GENERATED" || result=$?
+            if [ $result -eq 0 ]; then
+              git -C ../go-src push upstream generated/go 2> /dev/null
+            fi
+
+workflows:
+  version: 2
+  build_and_push:
+    jobs:
+      - lint
+      - build:
+          requires:
+            - lint
+          filters:
+            branches:
+              only:
+                - master
+      - push:
+          requires:
+            - lint
+            - build
+          filters:
+            branches:
+              only:
+                - master
