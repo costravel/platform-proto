@@ -3,51 +3,72 @@
 
 ## Table of Contents
 
-- [echo.proto](#echo.proto)
-    - [EchoReply](#.EchoReply)
-    - [EchoRequest](#.EchoRequest)
+- [user.proto](#user.proto)
+    - [UserCreationRequest](#.UserCreationRequest)
+    - [UserResponse](#.UserResponse)
+    - [UserSearchRequest](#.UserSearchRequest)
   
   
   
-    - [EchoService](#.EchoService)
+    - [UserService](#.UserService)
   
 
 - [Scalar Value Types](#scalar-value-types)
 
 
 
-<a name="echo.proto"></a>
+<a name="user.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## echo.proto
+## user.proto
 
 
 
-<a name=".EchoReply"></a>
+<a name=".UserCreationRequest"></a>
 
-### EchoReply
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| ret | [string](#string) |  |  |
-| time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
-
-
-
-
-
-
-<a name=".EchoRequest"></a>
-
-### EchoRequest
+### UserCreationRequest
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| say | [string](#string) |  |  |
+| email | [string](#string) |  |  |
+| nickname | [string](#string) |  |  |
+| password | [string](#string) |  |  |
+
+
+
+
+
+
+<a name=".UserResponse"></a>
+
+### UserResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_id | [uint64](#uint64) |  |  |
+| created_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+| email | [string](#string) |  |  |
+| nickname | [string](#string) |  |  |
+| password | [string](#string) |  |  |
+
+
+
+
+
+
+<a name=".UserSearchRequest"></a>
+
+### UserSearchRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| email | [string](#string) |  |  |
 
 
 
@@ -60,14 +81,15 @@
  
 
 
-<a name=".EchoService"></a>
+<a name=".UserService"></a>
 
-### EchoService
+### UserService
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Echo | [.EchoRequest](#EchoRequest) | [.EchoReply](#EchoReply) |  |
+| CreateUser | [.UserCreationRequest](#UserCreationRequest) | [.UserResponse](#UserResponse) |  |
+| SearchUser | [.UserSearchRequest](#UserSearchRequest) | [.UserResponse](#UserResponse) |  |
 
  
 
