@@ -11,3 +11,8 @@ services:
         volumes:
             - .:/defs
         command: "-d ./${PROJECT}/protos -o ./${PROJECT}/pb-go --with-docs markdown,readme.md --with-gateway -l go"
+    java:
+        image: namely/protoc-all:1.16_0
+        volumes:
+            - .:/defs
+        command: "-d ./${PROJECT}/protos -o ./${PROJECT}/pb-java --with-docs markdown,readme.md --with-gateway -l java"

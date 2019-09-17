@@ -27,7 +27,7 @@ jobs:
           name: Clean up
           command: rm -rf ./*/pb-go
       - run:
-          name: Generate gRPC for go Project=costravel-user
+          name: Generate gRPC for golang
           command: |
             DIC=`find . -maxdepth 1 -mindepth 1 -type d |grep -v "\/\." | sed 's!^.*/!!'`
             for DIR in $DIC
@@ -36,6 +36,17 @@ jobs:
               source $BASH_ENV
               echo $PROJECT
               docker-compose run --rm go
+            done
+      - run:
+          name: Generate gRPC for java
+          command: |
+            DIC=`find . -maxdepth 1 -mindepth 1 -type d |grep -v "\/\." | sed 's!^.*/!!'`
+            for DIR in $DIC
+            do
+              echo "export PROJECT=${DIR}" >> $BASH_ENV
+              source $BASH_ENV
+              echo $PROJECT
+              docker-compose run --rm java
             done
       - persist_to_workspace:
           root: .
@@ -77,9 +88,37 @@ jobs:
             git -C ../go-src add -A
             git -C ../go-src status
             result=0
-            git -C ../go-src commit -m "AUTO GENERATED" || result=$?
+            git -C ../go-src commit -m "AUTO GENERATED [ci skip]" || result=$?
             if [ $result -eq 0 ]; then
               git -C ../go-src push upstream generated/go 2> /dev/null
+            fi
+      - run:
+          name: git commit java-src
+          command: |
+            if [ `git branch -r --list origin/generated/java | wc -l` -eq 1 ]; then
+              echo "checkout generated/java"
+              git fetch origin
+              git worktree add -b generated/java ../go-src origin/generated/java
+              git -C ../java-src rm `git -C ../java-src ls-files`
+            else
+              echo "create generated/java"
+              git worktree add --detach ../java-src
+              git -C ../java-src checkout --orphan generated/java
+              git -C ../java-src rm --cached -r .
+              git -C ../java-src clean -d -f
+            fi
+            DIC=`find . -maxdepth 1 -mindepth 1 -type d |grep -v "\/\." | sed 's!^.*/!!'`
+            for DIR in $DIC
+            do
+              echo $DIR
+              cp -r ./$DIR/pb-java/ ../java-src/$DIR/
+            done
+            git -C ../java-src add -A
+            git -C ../java-src status
+            result=0
+            git -C ../java-src commit -m "AUTO GENERATED [ci skip]" || result=$?
+            if [ $result -eq 0 ]; then
+              git -C ../java-src push upstream generated/java 2> /dev/null
             fi
 
 workflows:
